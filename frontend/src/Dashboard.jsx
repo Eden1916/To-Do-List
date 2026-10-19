@@ -1,4 +1,6 @@
-import {ListTodo, CircleCheck, Clock} from "lucide-react"
+import {ListTodo, CircleCheck, Clock, Pencil, Trash2 } from "lucide-react"
+import { Card,CardHeader, CardTitle} from "./components/ui/card";
+import {Button} from "./components/ui/button";
 export default function Dashboard() {
 
     const cards = [
@@ -25,6 +27,28 @@ export default function Dashboard() {
                         <p className="text-2xl font-bold text-gray-800">{card.value}</p>
                         </div>
                 )})}
+                </div>
+                
+                <div className="rounded bg-gray-200 p-6">
+                  <div className="p-2">
+                    <h2 className="text-lg font-bold text-Black">
+                      My Tasks
+                    </h2>
+                  </div>
+                  <Card className="bg-gray-300 p-4 flex flex-row w-full items-center justify-between gap-4">
+                    <div className="flex-1">
+                    <h2 className=" text-lg font-bold text-gray-800">Finish the project I started</h2>
+                    <p className="text-gray-600">pending</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="icon" aria-label="Edit Task">
+                            <Pencil className="w-4 h-4"/>
+                        </Button>
+                        <Button variant="outline" size="icon" aria-label="Delete Task">
+                            <Trash2 className="w-4 h-4"/>
+                        </Button>
+                    </div>
+                  </Card>
                 </div>
         </div>
     )
