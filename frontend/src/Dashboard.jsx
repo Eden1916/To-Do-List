@@ -1,5 +1,6 @@
 import {ListTodo, CircleCheck, Clock, Pencil, Trash2, Send } from "lucide-react"
 import { Card,CardHeader, CardTitle} from "./components/ui/card";
+import { ModeToggle } from "./components/mode-toggle";
 import {Button} from "./components/ui/button";
 export default function Dashboard() {
 
@@ -10,10 +11,13 @@ export default function Dashboard() {
     ]
     return (
         <div className="space-y-6">
-            <div className="bg-blue-950 shadow-sm p-6">
-                <h1 className="text-3xl font-bold text-white">
+            <div className="bg-blue-950 shadow-sm p-6 flex felx-rows items-center justify-between gap-4">
+                <h1 className="flex-1 text-3xl font-bold text-white">
                     To-Do List Bot
                 </h1>
+                <Button variant="outline" size="icon" aria-label="Edit Task">
+                <ModeToggle className="w-4 h-4"/>
+                </Button>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {cards.map((card)=> {
