@@ -1,4 +1,4 @@
-import {ListTodo, CircleCheck, Clock, Pencil, Trash2 } from "lucide-react"
+import {ListTodo, CircleCheck, Clock, Pencil, Trash2, Send } from "lucide-react"
 import { Card,CardHeader, CardTitle} from "./components/ui/card";
 import {Button} from "./components/ui/button";
 export default function Dashboard() {
@@ -35,7 +35,21 @@ export default function Dashboard() {
                       My Tasks
                     </h2>
                   </div>
-                  <Card className="bg-gray-300 p-4 flex flex-row w-full items-center justify-between gap-4">
+                  <Card className="bg-gray-300 p-4 flex flex-row w-full items-center justify-between gap-4 m-2">
+                    <div className="flex-1">
+                    <h2 className=" text-lg font-bold text-gray-800">Finish the project I started</h2>
+                    <p className="text-gray-600">pending</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="icon" aria-label="Edit Task">
+                            <Pencil className="w-4 h-4"/>
+                        </Button>
+                        <Button variant="outline" size="icon" aria-label="Delete Task">
+                            <Trash2 className="w-4 h-4"/>
+                        </Button>
+                    </div>
+                  </Card>
+                  <Card className="bg-gray-300 p-4 flex flex-row w-full items-center justify-between gap-4 m-2">
                     <div className="flex-1">
                     <h2 className=" text-lg font-bold text-gray-800">Finish the project I started</h2>
                     <p className="text-gray-600">pending</p>
@@ -50,6 +64,16 @@ export default function Dashboard() {
                     </div>
                   </Card>
                 </div>
+                <div className="bg-gray-200 p-5 flex felx-row justify-between items-center gap-3 rounded-lg m-5">
+                <div className="flex-1 p-3">
+                    <input className="flex-1 w-full border-1 rounded p-3" placeholder="Your message"></input>
+                    </div>
+                    <div className="flex">
+                        <Button variant="outline" size="icon" aria-lebel="send">
+                            <Send className="w-4 h-4"/>
+                        </Button>
+                    </div>
+                  </div>
         </div>
     )
 }
