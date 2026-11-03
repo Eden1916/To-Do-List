@@ -11,10 +11,10 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen space-y-6 bg-white dark:bg-gray-900 text-black dark:text-white">
+    <div className="min-h-screen space-y-6 bg-white dark:bg-gray-900 text-black dark:text-white pb-5">
       {/* Header */}
       <div className="bg-gray-400 dark:bg-blue-950 shadow-sm p-6 flex flex-row items-center justify-between gap-4">
-        <h1 className="flex-1 text-3xl font-bold text-white">To-Do List Bot</h1>
+        <h1 className="flex-1 text-3xl font-bold text-black dark:text-white">To-Do List Bot</h1>
         <ModeToggle />
       </div>
 
@@ -73,7 +73,7 @@ export default function Dashboard() {
       </div>
 
       {/* Message input */}
-      <div className="bg-gray-200 dark:bg-gray-800 p-5 flex flex-row justify-between items-center gap-3 rounded-lg m-5">
+      <div className="bg-gray-200 dark:bg-gray-800 p-5 flex flex-row justify-between items-center gap-3 rounded-lg mx-5">
         <div className="flex-1 p-3">
           <input
             className="w-full border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded p-3"
