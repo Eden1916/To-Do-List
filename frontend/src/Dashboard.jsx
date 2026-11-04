@@ -2,8 +2,26 @@ import { ListTodo, CircleCheck, Clock, Pencil, Trash2, Send } from "lucide-react
 import { Card } from "./components/ui/card";
 import { ModeToggle } from "./components/mode-toggle";
 import { Button } from "./components/ui/button";
+import {useState, useEffect} from "react"
 
 export default function Dashboard() {
+
+  const [recentTask, setRecentTask] = useState([])
+  const token = localStorage.getItem("token")
+
+  useEffect(()=>{
+    fetch(`${import.meta.env.VITE_API_URL}/tasks`,{
+      headers:{
+        Authentication:`Beare${token}`
+      }
+      }
+      .then((r)=> r.json())
+      .then((d)=> {
+      if(d.succes){
+        setRecentTask(d.tasks.slice(0,3))
+      }})
+    )
+  })
   const cards = [
     { label: "Total Tasks", value: 10, icon: ListTodo, color: "bg-blue-400" },
     { label: "Completed Tasks", value: 5, icon: CircleCheck, color: "bg-green-400" },
@@ -48,32 +66,24 @@ export default function Dashboard() {
         <div className="p-2">
           <h2 className="text-lg font-bold text-black dark:text-white">My Tasks</h2>
         </div>
-
-        {[1, 2].map((id) => (
-          <Card
-            key={id}
-            className="bg-gray-100 dark:bg-gray-700 p-4 flex flex-row w-full items-center justify-between gap-4 m-3"
-          >
-            <div className="flex-1">
+        {recentTask.length === 0 ? (
+          <p>You haven't enter any task yet</p>) :(
+            <div className="space-y">
+            {recentTask.map((task)=>{
+              <card key={task} className="bg-gray-100 dark:bg-gray-700 p-4 flex flex-row w-full items-center justify-between gap-4 m-3">
+                <div className="flex-1">
               <h2 className="text-lg font-bold text-black dark:text-white">
-                Finish the project I started
+                {task.yourtask}
               </h2>
-              <p className="text-gray-600 dark:text-gray-300">pending</p>
+              </div>
+              </card>
+            })}
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" aria-label="Edit Task">
-                <Pencil className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="icon" aria-label="Delete Task">
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
+          )}
+          </div>
 
       {/* Message input */}
-      <div className="bg-gray-200 dark:bg-gray-800 p-5 flex flex-row justify-between items-center gap-3 rounded-lg mx-5">
+      <div className="bg-gray-300 dark:bg-gray-800 p-5 flex flex-row justify-between items-center gap-3 rounded-lg mx-5">
         <div className="flex-1 p-3">
           <input
             className="w-full border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded p-3"
