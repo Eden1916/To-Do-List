@@ -3,10 +3,12 @@ import { Card } from "./components/ui/card";
 import { ModeToggle } from "./components/mode-toggle";
 import { Button } from "./components/ui/button";
 import {useState, useEffect} from "react"
+import {useNavigate} from "react-router-dom"
 
 export default function Dashboard() {
 
   const [recentTask, setRecentTask] = useState([])
+  const navigate = useNavigate()
   const token = localStorage.getItem("token")
 
   useEffect(()=>{
@@ -23,9 +25,9 @@ export default function Dashboard() {
     )
   })
   const cards = [
-    { label: "Total Tasks", value: 10, icon: ListTodo, color: "bg-blue-400" },
-    { label: "Completed Tasks", value: 5, icon: CircleCheck, color: "bg-green-400" },
-    { label: "Pending Tasks", value: 5, icon: Clock, color: "bg-yellow-400" },
+    { label: "Total Tasks", value: 10, icon: ListTodo, path:"/tasks", color: "bg-blue-400" },
+    { label: "Completed Tasks", value: 5, icon: CircleCheck, path:"/tasks/completed", color: "bg-green-400" },
+    { label: "Pending Tasks", value: 5, icon: Clock, path:"/tasks/pending", color: "bg-yellow-400" },
   ];
 
   return (
@@ -41,8 +43,9 @@ export default function Dashboard() {
         {cards.map((card) => {
           const Icon = card.icon;
           return (
-            <div
+            <button
               key={card.label}
+              onClick={() =>navigate(card.path)}
               className="w-full bg-gray-200 dark:bg-gray-800 rounded-lg p-6 shadow-md"
             >
               <div
@@ -56,7 +59,7 @@ export default function Dashboard() {
               <p className="text-2xl font-bold text-black dark:text-white">
                 {card.value}
               </p>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -73,7 +76,7 @@ export default function Dashboard() {
               <card key={task} className="bg-gray-100 dark:bg-gray-700 p-4 flex flex-row w-full items-center justify-between gap-4 m-3">
                 <div className="flex-1">
               <h2 className="text-lg font-bold text-black dark:text-white">
-                {task.yourtask}
+                {task.title}
               </h2>
               </div>
               </card>
