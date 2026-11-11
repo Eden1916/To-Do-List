@@ -11,7 +11,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const token = localStorage.getItem("token")
 
-  useEffect(()=>{
+  /*useEffect(()=>{
     fetch(`${import.meta.env.VITE_API_URL}/tasks`,{
       headers:{
         Authentication:`Beare${token}`
@@ -23,11 +23,11 @@ export default function Dashboard() {
         setRecentTask(d.tasks.slice(0,3))
       }})
     )
-  })
+  })*/
   const cards = [
-    { label: "Total Tasks", value: 10, icon: ListTodo, path:"/tasks", color: "bg-blue-400" },
-    { label: "Completed Tasks", value: 5, icon: CircleCheck, path:"/tasks/completed", color: "bg-green-400" },
-    { label: "Pending Tasks", value: 5, icon: Clock, path:"/tasks/pending", color: "bg-yellow-400" },
+    { label: "Total Tasks", value: 10, icon: ListTodo, path:"/Tasks", color: "bg-blue-400" },
+    { label: "Completed Tasks", value: 5, icon: CircleCheck, path:"/Tasks/Completed", color: "bg-green-400" },
+    { label: "Pending Tasks", value: 5, icon: Clock, path:"/Tasks/Pending", color: "bg-yellow-400" },
   ];
 
   return (
@@ -46,7 +46,7 @@ export default function Dashboard() {
             <button
               key={card.label}
               onClick={() =>navigate(card.path)}
-              className="w-full bg-gray-200 dark:bg-gray-800 rounded-lg p-6 shadow-md"
+              className="w-full bg-gray-200 dark:bg-gray-800 rounded-lg p-6 shadow-md cursor-pointer"
             >
               <div
                 className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${card.color}`}

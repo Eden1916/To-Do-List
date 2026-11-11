@@ -34,8 +34,8 @@ export default function Login() {
         }
     }
     return(
-        <div className="min-h-screen bg-gray-800 flex flex-column items-center justify-center " onSubmit={handleClick}>
-            <form className="space-y-5 bg-gray-600 rounded-lg p-5 m-15">
+        <div className="min-h-screen bg-gray-900 flex flex-column items-center justify-center " onSubmit={handleClick}>
+            <form className="space-y-5 bg-gray-700 rounded-lg p-5 m-15">
              <h2 className="font-bold text-2xl text-center">Login</h2>
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm flex items-start gap-2">
@@ -44,26 +44,26 @@ export default function Login() {
                 </div>
               )}
                 <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1.5">
+                <label className="block text-sm font-medium text-gray-950 mb-1.5">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700" />
                     <input 
                     required
                     autoComplete="email"
                      type="email" 
                      value={email} 
                      onChange={(e) => setEmail(e.target.value)} 
-                     className="w-full border border-gray-200 rounded-xl pl-10 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-950 focus:border-transparent bg-gray-400 transition"/>
+                     className="w-full border border-gray-200 rounded-xl pl-10 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-950 focus:border-transparent bg-gray-500 transition"/>
                     </div>
                     </div>
                 <div>
-                <label className="block text-sm font-medium text-gray-900 mb-1.5">
+                <label className="block text-sm font-medium text-gray-950 mb-1.5">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700" />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -71,12 +71,12 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full border border-gray-200 rounded-xl pl-10 pr-12 py-3 px-5 text-sm focus:outline-none focus:ring-2 focus:ring-red-950 focus:border-transparent bg-gray-400 transition"
+                    className="w-full border border-gray-200 rounded-xl pl-10 pr-12 py-3 px-5 text-sm focus:outline-none focus:ring-2 focus:ring-red-950 focus:border-transparent bg-gray-500 transition"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -85,7 +85,7 @@ export default function Login() {
                 <button 
                 type="submit"
                 disabled={loading} 
-                className="bg-gray-900 text-white rounded p-1 w-full hover:bg-gray-800 cursor-pointer active-bg-gray-900 active-text-white">
+                className="bg-gray-950 text-white rounded p-1 w-full hover:bg-gray-800 cursor-pointer active-bg-gray-900 active-text-white">
                 {loading === true ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@ export default function Login() {
                   </span>
                 ) : "Login"}
                 </button>
-                <div className="mt-6 pt-6 border-t border-gray-100 text-center text-sm text-gray-400">
+                <div className="mt-6 pt-6 border-t border-gray-100 text-center text-sm text-gray-500">
               Have no account?{" "}
               <button onClick={() => navigate("/Signup")} className="text-gray-950 font-semibold hover:underline hover:cursor-pointer">
                 Sign up
