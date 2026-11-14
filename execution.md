@@ -60,7 +60,7 @@ retarget P2 to `main` and resolve any base changes before merging P2.
 | Order | Branch | Proposed PR title | Dependency | What it must achieve | Actual PR |
 | --- | --- | --- | --- | --- | --- |
 | P1 | `feat/3-api-foundation` | Establish API contract and persistent data model | None | Runnable API, dependencies, config, database, models, schemas, CORS, consistent errors | [#4](https://github.com/Eden1916/To-Do-List/pull/4) — open |
-| P2 | `feat/3-authentication` | Implement registration, login, and current user | P1 | Hashed passwords, expiring tokens, reusable auth dependency | Pending |
+| P2 | `feat/3-authentication` | Implement registration, login, and current user | P1 | Hashed passwords, expiring tokens, reusable auth dependency | [#5](https://github.com/Eden1916/To-Do-List/pull/5) — draft, targets P1 |
 | P3 | `feat/3-task-api` | Implement user-scoped tasks and dashboard statistics | P2 | Persistent CRUD, filters, ordering, counts, ownership | Pending |
 | P4 | `feat/3-message-api` | Turn bot messages into persisted tasks | P3 | Protected simple-mode message endpoint and replies | Pending |
 | P5 | `feat/3-frontend-integration` | Connect frontend authentication, tasks, statistics, and messages | P4 | Working browser journey using actual API data | Pending |
@@ -179,13 +179,13 @@ Review each PR at its checkpoint and merge passing work before starting its depe
 ## Completion record
 
 - P1 PR: [#4](https://github.com/Eden1916/To-Do-List/pull/4), draft; merge pending
-- P2 merged PR: pending
+- P2 PR: [#5](https://github.com/Eden1916/To-Do-List/pull/5), draft targeting P1; retarget to `main` after P1 merges
 - P3 merged PR: pending
 - P4 merged PR: pending
 - P5 merged PR: pending
 - P6 merged PR: pending
 - Automated checks: P1 implementation commit `002d4f6` has 14 passing tests in a fresh Python 3.10 virtual environment; `pip check`, Uvicorn startup/health/docs smoke check, and `git diff --check` pass. The test stack emits one Starlette/httpx deprecation warning. P3-P6 verification remains pending; P2 results are recorded below.
 - Browser acceptance evidence: pending
-- P2 verification: 45 combined tests pass (31 authentication cases), dependency checks pass, and real Uvicorn signup/login/me/missing-token checks pass. One existing Starlette/httpx test-client deprecation warning remains.
+- P2 verification: implementation commit `7735a00` has 45 passing combined tests (31 authentication cases); dependency checks and real Uvicorn signup/login/me/missing-token checks pass. One existing Starlette/httpx test-client deprecation warning remains.
 - Remaining required issue boxes: P1 foundation and P2 authentication implemented and verified; PR review/merge pending. Task/statistics endpoints, messages, and frontend integration remain in P3-P6.
 - Optional/later work deferred: pagination if omitted; smarter command parser; due dates/priority; search; password reset
