@@ -3,7 +3,7 @@
 Target: finish the required checklist today, November 14, 2026 (America/Los_Angeles).
 Source: [Issue #3 — Backend requirments for the To Do List](https://github.com/Eden1916/To-Do-List/issues/3).
 
-This document is the implementation plan. Checkboxes below track future work; creating this plan does not mean the features are implemented. PR labels P1–P6 are planned PRs, not assigned GitHub PR numbers. Record actual links when opened.
+This document is the implementation plan. Checkboxes below track completed and remaining work. P1–P6 identify work packages; actual GitHub PR numbers and links are recorded when opened.
 
 ## Starting point
 
@@ -54,7 +54,7 @@ Start every new branch from updated `main` after its predecessor merges. This ke
 
 | Order | Branch | Proposed PR title | Dependency | What it must achieve | Actual PR |
 | --- | --- | --- | --- | --- | --- |
-| P1 | `feat/3-api-foundation` | Establish API contract and persistent data model | None | Runnable API, dependencies, config, database, models, schemas, CORS, consistent errors | Pending |
+| P1 | `feat/3-api-foundation` | Establish API contract and persistent data model | None | Runnable API, dependencies, config, database, models, schemas, CORS, consistent errors | [#4](https://github.com/Eden1916/To-Do-List/pull/4) — open |
 | P2 | `feat/3-authentication` | Implement registration, login, and current user | P1 | Hashed passwords, expiring tokens, reusable auth dependency | Pending |
 | P3 | `feat/3-task-api` | Implement user-scoped tasks and dashboard statistics | P2 | Persistent CRUD, filters, ordering, counts, ownership | Pending |
 | P4 | `feat/3-message-api` | Turn bot messages into persisted tasks | P3 | Protected simple-mode message endpoint and replies | Pending |
@@ -173,13 +173,13 @@ Review each PR at its checkpoint and merge passing work before starting its depe
 
 ## Completion record
 
-- P1 merged PR: pending
+- P1 PR: [#4](https://github.com/Eden1916/To-Do-List/pull/4), open; merge pending
 - P2 merged PR: pending
 - P3 merged PR: pending
 - P4 merged PR: pending
 - P5 merged PR: pending
 - P6 merged PR: pending
-- Automated checks: P1 has 14 passing tests in a fresh Python 3.10 virtual environment; `pip check`, Uvicorn startup/health/docs smoke check, and `git diff --check` pass. The test stack emits one Starlette/httpx deprecation warning. P2-P6 verification remains pending.
+- Automated checks: P1 implementation commit `002d4f6` has 14 passing tests in a fresh Python 3.10 virtual environment; `pip check`, Uvicorn startup/health/docs smoke check, and `git diff --check` pass. The test stack emits one Starlette/httpx deprecation warning. P2-P6 verification remains pending.
 - Browser acceptance evidence: pending
 - Remaining required issue boxes: P1 foundation implemented and verified; PR review/merge pending. Authentication, task/statistics endpoints, messages, and frontend integration remain in P2-P6.
 - Optional/later work deferred: pagination if omitted; smarter command parser; due dates/priority; search; password reset
