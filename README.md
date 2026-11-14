@@ -12,6 +12,7 @@ Requires Python 3.10 or newer. From the repository root in PowerShell:
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[test]"
 Copy-Item .env.example .env
+.\.venv\Scripts\python.exe -c "import secrets; print('TODO_JWT_SECRET=' + secrets.token_urlsafe(48))" | Add-Content .env
 .\.venv\Scripts\python.exe -m todo_chat.init_db
 .\.venv\Scripts\python.exe -m uvicorn todo_chat.main:app --reload
 ```
@@ -19,9 +20,9 @@ Copy-Item .env.example .env
 The API is at http://localhost:8000; interactive documentation is at
 http://localhost:8000/docs. `GET /health` returns `{"status":"ok"}`.
 
-P1 provides the application foundation and database models. Authentication,
-task routes, statistics, and message handling are planned in subsequent PRs;
-the endpoint contract below describes those upcoming routes.
+P1 provides the application foundation and database models. P2 adds signup,
+login, and current-user authentication. Task routes, statistics, and message
+handling remain planned in subsequent PRs.
 
 ## Configuration and database
 
@@ -32,6 +33,14 @@ variables take precedence. Never commit `.env` or a local database.
 | --- | --- | --- |
 | `TODO_DATABASE_URL` | `sqlite:///./todo.db` | SQLAlchemy database URL; relative paths resolve from the working directory |
 | `TODO_CORS_ORIGINS` | `["http://localhost:5173"]` | JSON array of allowed frontend origins |
+| `TODO_JWT_SECRET` | Required for API startup | Random signing secret, at least 32 characters; generate once and keep private |
+| `TODO_ACCESS_TOKEN_MINUTES` | `60` | Token lifetime in minutes, 1–10080 |
+
+Keep the same signing secret across restarts and application workers so tokens
+remain valid until expiry. Changing the secret invalidates existing tokens.
+There is no built-in signing secret; API startup fails if it is missing. The
+database initialization command does not require a signing secret. Generate
+the secret once during setup; do not append another value on every restart.
 
 SQLite is the supported local setup. Other SQLAlchemy database URLs require
 their database driver and separate verification before deployment.
@@ -48,7 +57,7 @@ mode does not need a conversation state machine or a session table.
 
 ## API contract for issue #3
 
-Requests and application responses use JSON. Protected routes will read
+Requests and application responses use JSON. Protected routes read
 `Authorization: Bearer <token>`. Errors use `{"message":"readable explanation"}`.
 Invalid request input returns 400 (including malformed JSON); missing routes
 return 404; unexpected failures return 500 with a safe message. Authentication
@@ -59,9 +68,9 @@ operations with 200. Development CORS allows the frontend at
 | Route (planned unless noted) | Request | Response |
 | --- | --- | --- |
 | `GET /health` (implemented) | None | `{ status: "ok" }` |
-| `POST /auth/signup` | `{ name, email, password }` | 201 `{ token, user }` |
-| `POST /auth/login` | `{ email, password }` | 200 `{ token, user }` |
-| `GET /auth/me` | Bearer token | `{ user }` |
+| `POST /auth/signup` (implemented) | `{ name, email, password }` | 201 `{ token, user }` |
+| `POST /auth/login` (implemented) | `{ email, password }` | 200 `{ token, user }` |
+| `GET /auth/me` (implemented) | Bearer token | `{ user }` |
 | `GET /tasks` | Optional query options below | `{ tasks }` |
 | `POST /tasks` | `{ title, description? }` | 201 `{ task }` |
 | `PATCH /tasks/{id}` | Title, description, and/or status | `{ task }` |
@@ -70,9 +79,16 @@ operations with 200. Development CORS allows the frontend at
 | `POST /messages` | `{ text }` | `{ reply, task }` |
 
 User responses contain `id`, `name`, and `email`, never passwords or hashes.
-P2 will hash passwords, normalize emails, reject duplicates, and issue signed
-tokens with a proposed 60-minute expiry and an environment-configured secret.
-Wrong email/password responses will use `Invalid email or password`.
+Passwords use Argon2id hashes through pwdlib; signup requires 8–128 characters.
+Emails are normalized to lowercase for signup and login, and duplicate emails
+return 400 even when concurrent signups race. Names are trimmed (1–100 characters).
+Tokens are signed with HS256 using PyJWT, include user ID and expiration, and
+validate the algorithm, issuer, audience, and required claims. Missing, invalid,
+expired tokens and tokens for deleted users return 401. Wrong email/password
+responses use `Invalid email or password`. Responses never include hashes.
+
+These choices follow the [FastAPI security guidance](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/)
+and [PyJWT usage documentation](https://pyjwt.readthedocs.io/en/stable/usage.html).
 
 Task responses contain `id`, `title`, `description`, `status`, `createdAt`,
 `updatedAt`, and `ownerUserId`. Status is `pending` or `completed`, with pending
@@ -101,3 +117,6 @@ Foundation tests cover JSON success/errors, invalid JSON and validation, CORS
 (including server errors), persistent database defaults/constraints, UTC
 timestamps, task response aliases, and configuration. Test-only diagnostic
 routes are not present in the application.
+Authentication tests also cover credential failures, normalization, concurrent
+duplicates, stored password hashes, invalid/expired tokens, and persistence
+of users and tokens across application restarts.

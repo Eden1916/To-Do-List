@@ -20,7 +20,9 @@ from todo_chat.schema import TaskCreate, TaskResponse, TaskStatus, TaskUpdate, U
 
 @pytest.fixture
 def client():
-    app = create_app(Settings(_env_file=None, database_url="sqlite://"))
+    app = create_app(Settings(
+        _env_file=None, database_url="sqlite://", jwt_secret="foundation-test-secret-at-least-32-characters"
+    ))
     # Test-only routes exercise handlers without exposing diagnostic routes.
     @app.app.post("/validate")
     def validate(payload: TaskCreate):

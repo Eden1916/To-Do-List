@@ -14,12 +14,28 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
+    model_config = ConfigDict(extra="forbid")
     password: str = Field(min_length=8, max_length=128)
 
 
 class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
+
+
+class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    email: EmailStr
+    password: str = Field(min_length=1, max_length=128)
+
+
+class AuthResponse(BaseModel):
+    token: str
+    user: UserResponse
+
+
+class CurrentUserResponse(BaseModel):
+    user: UserResponse
 
 
 class TaskStatus(str, Enum):

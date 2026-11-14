@@ -11,7 +11,7 @@ This document is the implementation plan. Checkboxes below track completed and r
 - The locally available `origin/backend` has the same two files. The locally available `origin/frontend` contains a React/Vite application, authentication screens, dashboard, and task pages. Remote-tracking refs must be refreshed before implementation; they may be stale.
 - Existing schemas use `username`, boolean task status, and snake_case timestamps. Issue #3 requires user `name`, string task status, and camelCase task timestamps. Resolve these at the API boundary before integration.
 - Frontend auth currently has an unquoted JSON content type, `JSON.stringigy`, incorrect request serialization, and a dependency on `data.success` that is absent from the issue's required response shape. Dashboard counts are hardcoded and task fetching is commented out.
-- P1 implementation is on `feat/3-api-foundation`; its PR and verification status are tracked below. P2-P6 have not started.
+- P1 implementation is on `feat/3-api-foundation`. P2 authentication is implemented on `feat/3-authentication`; verification and PR status are tracked below. P3-P6 have not started.
 
 ## Finish line and scope
 
@@ -52,6 +52,11 @@ Use a maintained password-hashing library with bcrypt or an equivalent secure al
 
 Start every new branch from updated `main` after its predecessor merges. This keeps PR diffs focused and avoids a stack that is hard to finish today. Keep existing `backend` and `frontend` branch work intact. Every PR references `Refs #3`; only P6 uses `Closes #3`, after all required acceptance checks pass. Update the actual PR column as work progresses.
 
+Current exception: work on P2 continued while P1 (#4) remains a draft. P2 is
+based on `feat/3-api-foundation` and its draft PR targets that branch so the
+diff contains only authentication changes. Merge P1 into `main` first, then
+retarget P2 to `main` and resolve any base changes before merging P2.
+
 | Order | Branch | Proposed PR title | Dependency | What it must achieve | Actual PR |
 | --- | --- | --- | --- | --- | --- |
 | P1 | `feat/3-api-foundation` | Establish API contract and persistent data model | None | Runnable API, dependencies, config, database, models, schemas, CORS, consistent errors | [#4](https://github.com/Eden1916/To-Do-List/pull/4) — open |
@@ -76,11 +81,11 @@ Suggested files: `todo_chat/main.py`, `config.py`, `database.py`, `models.py`, e
 
 ### P2 — authentication (75–90 minutes)
 
-- [ ] Implement signup using name/email/password; normalize emails consistently and enforce uniqueness in the database, including concurrent duplicate attempts.
-- [ ] Hash passwords and exclude plaintext and hash from all responses/logging.
-- [ ] Implement login returning `{ token, user }`; wrong email and wrong password both give the required generic 401 message.
-- [ ] Add signed expiring tokens, shared authentication dependency, and protected `/auth/me`.
-- [ ] Test signup, duplicate email, valid login, wrong credentials, missing/malformed/tampered/expired tokens, and refresh restoration through `/auth/me`.
+- [x] Implement signup using name/email/password; normalize emails consistently and enforce uniqueness in the database, including concurrent duplicate attempts.
+- [x] Hash passwords with Argon2id and exclude plaintext and hash from all API responses and application log messages.
+- [x] Implement login returning `{ token, user }`; wrong email and wrong password both give the required generic 401 message.
+- [x] Add signed expiring tokens, shared authentication dependency, and protected `/auth/me`. Require an environment-configured signing secret at startup.
+- [x] Test signup, concurrent duplicate email, valid login, wrong credentials, missing/malformed/tampered/unsigned/expired tokens, deleted users, and restoration after restart. All 45 combined foundation/auth tests pass; `pip check` and real-server signup/login/me smoke checks pass.
 
 Exit: a new user authenticates successfully; protected requests fail with 401 for every invalid-token case.
 
@@ -173,13 +178,14 @@ Review each PR at its checkpoint and merge passing work before starting its depe
 
 ## Completion record
 
-- P1 PR: [#4](https://github.com/Eden1916/To-Do-List/pull/4), open; merge pending
+- P1 PR: [#4](https://github.com/Eden1916/To-Do-List/pull/4), draft; merge pending
 - P2 merged PR: pending
 - P3 merged PR: pending
 - P4 merged PR: pending
 - P5 merged PR: pending
 - P6 merged PR: pending
-- Automated checks: P1 implementation commit `002d4f6` has 14 passing tests in a fresh Python 3.10 virtual environment; `pip check`, Uvicorn startup/health/docs smoke check, and `git diff --check` pass. The test stack emits one Starlette/httpx deprecation warning. P2-P6 verification remains pending.
+- Automated checks: P1 implementation commit `002d4f6` has 14 passing tests in a fresh Python 3.10 virtual environment; `pip check`, Uvicorn startup/health/docs smoke check, and `git diff --check` pass. The test stack emits one Starlette/httpx deprecation warning. P3-P6 verification remains pending; P2 results are recorded below.
 - Browser acceptance evidence: pending
-- Remaining required issue boxes: P1 foundation implemented and verified; PR review/merge pending. Authentication, task/statistics endpoints, messages, and frontend integration remain in P2-P6.
+- P2 verification: 45 combined tests pass (31 authentication cases), dependency checks pass, and real Uvicorn signup/login/me/missing-token checks pass. One existing Starlette/httpx test-client deprecation warning remains.
+- Remaining required issue boxes: P1 foundation and P2 authentication implemented and verified; PR review/merge pending. Task/statistics endpoints, messages, and frontend integration remain in P3-P6.
 - Optional/later work deferred: pagination if omitted; smarter command parser; due dates/priority; search; password reset
