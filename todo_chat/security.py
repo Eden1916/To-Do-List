@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from hmac import compare_digest
 from typing import Annotated
 
 import jwt
@@ -19,10 +20,10 @@ ISSUER = "todo-chat"
 AUDIENCE = "todo-chat-api"
 
 
-def create_access_token(user_id: int, settings: Settings) -> str:
+def create_access_token(user_id: int, account_id: str, settings: Settings) -> str:
     now = datetime.now(timezone.utc)
     return jwt.encode(
-        {"sub": str(user_id), "iat": now,
+        {"sub": str(user_id), "aid": account_id, "iat": now,
          "exp": now + timedelta(minutes=settings.access_token_minutes),
          "iss": ISSUER, "aud": AUDIENCE},
         settings.jwt_secret.get_secret_value(), algorithm="HS256",
@@ -45,14 +46,17 @@ def get_current_user(
             credentials.credentials,
             request.app.state.settings.jwt_secret.get_secret_value(),
             algorithms=["HS256"], issuer=ISSUER, audience=AUDIENCE,
-            options={"require": ["sub", "iat", "exp"]},
+            options={"require": ["sub", "aid", "iat", "exp"]},
         )
+        account_id = payload["aid"]
+        if not isinstance(account_id, str):
+            raise ValueError("Invalid account ID")
         user_id = int(payload["sub"])
         if user_id < 1 or user_id > 2**63 - 1:
             raise ValueError("Invalid user ID")
     except (jwt.InvalidTokenError, ValueError):
         raise unauthorized from None
     user = session.get(User, user_id)
-    if user is None:
+    if user is None or not compare_digest(account_id, user.account_id):
         raise unauthorized
     return user

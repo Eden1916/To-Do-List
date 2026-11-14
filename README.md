@@ -45,9 +45,9 @@ the secret once during setup; do not append another value on every restart.
 SQLite is the supported local setup. Other SQLAlchemy database URLs require
 their database driver and separate verification before deployment.
 
-The initialization command creates missing tables and preserves existing data.
-It does **not** migrate existing columns: future schema changes require an
-explicit migration. The API does not create tables on startup. Users have
+The initialization command creates missing tables, preserves existing data,
+and adds unique account identifiers to existing users. The API does not create
+tables on startup. Users have
 unique emails and a password-hash column; tasks have an owner foreign key,
 pending/completed status constraint, and UTC creation/update timestamps.
 SQLite foreign keys are enabled on every connection.
@@ -82,9 +82,10 @@ User responses contain `id`, `name`, and `email`, never passwords or hashes.
 Passwords use Argon2id hashes through pwdlib; signup requires 8–128 characters.
 Emails are normalized to lowercase for signup and login, and duplicate emails
 return 400 even when concurrent signups race. Names are trimmed (1–100 characters).
-Tokens are signed with HS256 using PyJWT, include user ID and expiration, and
-validate the algorithm, issuer, audience, and required claims. Missing, invalid,
-expired tokens and tokens for deleted users return 401. Wrong email/password
+Tokens are signed with HS256 using PyJWT and include user ID, a unique account
+identifier, and expiration. Validation checks the algorithm, issuer, audience,
+required claims, and account identity. Missing, invalid, expired tokens and
+tokens for deleted users return 401. Wrong email/password
 responses use `Invalid email or password`. Responses never include hashes.
 
 These choices follow the [FastAPI security guidance](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/)

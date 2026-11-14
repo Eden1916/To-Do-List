@@ -177,3 +177,27 @@ def test_database_initialization_command(tmp_path):
     engine = build_engine(url)
     assert set(inspect(engine).get_table_names()) == {"tasks", "users"}
     engine.dispose()
+
+
+def test_database_initialization_migrates_existing_users(tmp_path):
+    engine = build_engine(f"sqlite:///{(tmp_path / 'legacy.db').as_posix()}")
+    with engine.begin() as connection:
+        connection.execute(text(
+            "CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(100) NOT NULL, "
+            "email VARCHAR(320) NOT NULL, password_hash VARCHAR(255) NOT NULL, "
+            "created_at DATETIME NOT NULL)"
+        ))
+        connection.execute(text(
+            "INSERT INTO users (id, name, email, password_hash, created_at) "
+            "VALUES (9, 'Ada', 'ada@example.com', 'legacy-hash', CURRENT_TIMESTAMP)"
+        ))
+
+    init_database(engine)
+    with Session(engine) as session:
+        user = session.get(User, 9)
+        assert user.account_id
+        account_id = user.account_id
+    init_database(engine)
+    with Session(engine) as session:
+        assert session.get(User, 9).account_id == account_id
+    engine.dispose()

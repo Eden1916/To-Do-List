@@ -33,7 +33,10 @@ def signup(payload: UserCreate, request: Request, session: DatabaseSession):
             raise HTTPException(400, "Email is already registered") from None
         raise
     session.refresh(user)
-    return {"token": create_access_token(user.id, request.app.state.settings), "user": user}
+    return {
+        "token": create_access_token(user.id, user.account_id, request.app.state.settings),
+        "user": user,
+    }
 
 
 @router.post("/login", response_model=AuthResponse)
@@ -44,7 +47,10 @@ def login(payload: LoginRequest, request: Request, session: DatabaseSession):
         raise HTTPException(
             401, "Invalid email or password", headers={"WWW-Authenticate": "Bearer"}
         )
-    return {"token": create_access_token(user.id, request.app.state.settings), "user": user}
+    return {
+        "token": create_access_token(user.id, user.account_id, request.app.state.settings),
+        "user": user,
+    }
 
 
 @router.get("/me", response_model=CurrentUserResponse)

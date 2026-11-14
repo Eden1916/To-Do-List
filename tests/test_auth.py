@@ -161,6 +161,20 @@ def test_current_user_is_scoped_to_token_and_deleted_users_are_rejected(client):
     assert client.get('/auth/me', headers={'Authorization': f"Bearer {first['token']}"}).status_code == 401
 
 
+def test_deleted_highest_id_token_is_rejected_after_id_reuse(client):
+    original = register(client).json()
+    with Session(client.app.app.state.engine) as session:
+        session.delete(session.get(User, original['user']['id']))
+        session.commit()
+
+    replacement = register(client, email='replacement@example.com').json()
+    assert replacement['user']['id'] == original['user']['id']
+    response = client.get(
+        '/auth/me', headers={'Authorization': 'Bearer ' + original['token']}
+    )
+    assert response.status_code == 401
+
+
 @pytest.mark.parametrize('payload', [
     {'name': ' ', 'email': 'ada@example.com', 'password': PASSWORD},
     {'name': 'Ada', 'email': 'invalid', 'password': PASSWORD},
