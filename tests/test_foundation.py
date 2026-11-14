@@ -20,7 +20,9 @@ from todo_chat.schema import TaskCreate, TaskResponse, TaskStatus, TaskUpdate, U
 
 @pytest.fixture
 def client():
-    app = create_app(Settings(_env_file=None, database_url="sqlite://"))
+    app = create_app(Settings(
+        _env_file=None, database_url="sqlite://", jwt_secret="foundation-test-secret-at-least-32-characters"
+    ))
     # Test-only routes exercise handlers without exposing diagnostic routes.
     @app.app.post("/validate")
     def validate(payload: TaskCreate):
@@ -122,9 +124,12 @@ def test_database_enforces_unique_email_and_owner(tmp_path):
     with Session(engine) as session:
         session.add(User(name="Ada", email="ada@example.com", password_hash="test-only"))
         session.commit()
-        session.add(User(name="Other", email="ada@example.com", password_hash="test-only"))
-        with pytest.raises(IntegrityError):
+        session.add(User(
+            name="Other", email="ada@example.com", password_hash="sensitive-hash-value"
+        ))
+        with pytest.raises(IntegrityError) as error:
             session.commit()
+        assert "sensitive-hash-value" not in str(error.value)
         session.rollback()
         session.add(Task(title="Orphan", owner_user_id=999))
         with pytest.raises(IntegrityError):
@@ -171,4 +176,28 @@ def test_database_initialization_command(tmp_path):
     assert "Database initialized" in result.stdout
     engine = build_engine(url)
     assert set(inspect(engine).get_table_names()) == {"tasks", "users"}
+    engine.dispose()
+
+
+def test_database_initialization_migrates_existing_users(tmp_path):
+    engine = build_engine(f"sqlite:///{(tmp_path / 'legacy.db').as_posix()}")
+    with engine.begin() as connection:
+        connection.execute(text(
+            "CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(100) NOT NULL, "
+            "email VARCHAR(320) NOT NULL, password_hash VARCHAR(255) NOT NULL, "
+            "created_at DATETIME NOT NULL)"
+        ))
+        connection.execute(text(
+            "INSERT INTO users (id, name, email, password_hash, created_at) "
+            "VALUES (9, 'Ada', 'ada@example.com', 'legacy-hash', CURRENT_TIMESTAMP)"
+        ))
+
+    init_database(engine)
+    with Session(engine) as session:
+        user = session.get(User, 9)
+        assert user.account_id
+        account_id = user.account_id
+    init_database(engine)
+    with Session(engine) as session:
+        assert session.get(User, 9).account_id == account_id
     engine.dispose()
