@@ -124,9 +124,12 @@ def test_database_enforces_unique_email_and_owner(tmp_path):
     with Session(engine) as session:
         session.add(User(name="Ada", email="ada@example.com", password_hash="test-only"))
         session.commit()
-        session.add(User(name="Other", email="ada@example.com", password_hash="test-only"))
-        with pytest.raises(IntegrityError):
+        session.add(User(
+            name="Other", email="ada@example.com", password_hash="sensitive-hash-value"
+        ))
+        with pytest.raises(IntegrityError) as error:
             session.commit()
+        assert "sensitive-hash-value" not in str(error.value)
         session.rollback()
         session.add(Task(title="Orphan", owner_user_id=999))
         with pytest.raises(IntegrityError):

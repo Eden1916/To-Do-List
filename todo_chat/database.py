@@ -13,7 +13,7 @@ class Base(DeclarativeBase):
 
 def build_engine(database_url: str) -> Engine:
     url = make_url(database_url)
-    options = {}
+    options = {"hide_parameters": True}
     if url.get_backend_name() == "sqlite":
         options["connect_args"] = {"check_same_thread": False}
         if url.database in (None, "", ":memory:"):
