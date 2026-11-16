@@ -63,7 +63,7 @@ P4 to `main` and resolve any base changes before merging P4.
 | P1 | `feat/3-api-foundation` | Establish API contract and persistent data model | None | Runnable API, dependencies, config, database, models, schemas, CORS, consistent errors | [#4](https://github.com/Eden1916/To-Do-List/pull/4) — merged |
 | P2 | `feat/3-authentication` | Implement registration, login, and current user | P1 | Hashed passwords, expiring tokens, reusable auth dependency | [#5](https://github.com/Eden1916/To-Do-List/pull/5) — merged |
 | P3 | `feat/3-task-api` | Implement user-scoped tasks and dashboard statistics | P2 | Persistent CRUD, filters, ordering, counts, ownership | [#6](https://github.com/Eden1916/To-Do-List/pull/6) — draft, targets main |
-| P4 | `feat/3-message-api` | Turn bot messages into persisted tasks | P3 | Protected simple-mode message endpoint and replies | Pending |
+| P4 | `feat/3-message-api` | Turn bot messages into persisted tasks | P3 | Protected simple-mode message endpoint and replies | [#7](https://github.com/Eden1916/To-Do-List/pull/7) — draft, targets P3 |
 | P5 | `feat/3-frontend-integration` | Connect frontend authentication, tasks, statistics, and messages | P4 | Working browser journey using actual API data | Pending |
 | P6 | `test/3-release-readiness` | Verify the complete to-do flow and document setup | P5 | Integration coverage, clean setup instructions, final issue evidence | Pending |
 
@@ -182,7 +182,7 @@ Review each PR at its checkpoint and merge passing work before starting its depe
 - P1 PR: [#4](https://github.com/Eden1916/To-Do-List/pull/4), merged into `main` at `5fac074`
 - P2 PR: [#5](https://github.com/Eden1916/To-Do-List/pull/5), merged into `main` at `bb62c3d`
 - P3 PR: [#6](https://github.com/Eden1916/To-Do-List/pull/6), draft targeting `main`; implementation commit `693505e`
-- P4 merged PR: pending
+- P4 PR: [#7](https://github.com/Eden1916/To-Do-List/pull/7), draft targeting `feat/3-task-api`; implementation commit `832743f`
 - P5 merged PR: pending
 - P6 merged PR: pending
 - Automated checks: P1 implementation commit `002d4f6` has 14 passing tests in a fresh Python 3.10 virtual environment; `pip check`, Uvicorn startup/health/docs smoke check, and `git diff --check` pass. The test stack emits one Starlette/httpx deprecation warning. P5-P6 verification remains pending; P2-P4 results are recorded below.
