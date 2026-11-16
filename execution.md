@@ -11,7 +11,7 @@ This document is the implementation plan. Checkboxes below track completed and r
 - The locally available `origin/backend` has the same two files. The locally available `origin/frontend` contains a React/Vite application, authentication screens, dashboard, and task pages. Remote-tracking refs must be refreshed before implementation; they may be stale.
 - Existing schemas use `username`, boolean task status, and snake_case timestamps. Issue #3 requires user `name`, string task status, and camelCase task timestamps. Resolve these at the API boundary before integration.
 - Frontend auth currently has an unquoted JSON content type, `JSON.stringigy`, incorrect request serialization, and a dependency on `data.success` that is absent from the issue's required response shape. Dashboard counts are hardcoded and task fetching is commented out.
-- P1 and P2 have merged into `main`. P3 tasks/statistics are implemented on `feat/3-task-api`; verification and PR status are tracked below. P4-P6 have not started. The file observations above describe the initial baseline.
+- P1 and P2 have merged into `main`. P3 tasks/statistics and P4 messages are implemented on `feat/3-task-api` and `feat/3-message-api`; verification and PR status are tracked below. P5-P6 have not started. The file observations above describe the initial baseline.
 
 ## Finish line and scope
 
@@ -54,6 +54,9 @@ Start every new branch from updated `main` after its predecessor merges. This ke
 
 P1 (#4) and P2 (#5) have merged into `main`. P3 starts from updated `main`
 at `bb62c3d`, including the account-identity and SQL-parameter logging fixes.
+P4 continues on top of unmerged P3 (#6), and its draft PR targets
+`feat/3-task-api` to isolate the message changes. Merge P3 first, then retarget
+P4 to `main` and resolve any base changes before merging P4.
 
 | Order | Branch | Proposed PR title | Dependency | What it must achieve | Actual PR |
 | --- | --- | --- | --- | --- | --- |
@@ -100,10 +103,10 @@ Exit: a new user authenticates successfully; protected requests fail with 401 fo
 
 ### P4 — message input (30–45 minutes)
 
-- [ ] Implement protected `POST /messages` with trimmed, nonempty text and the same title length bound.
-- [ ] Use the same task service as ordinary creation so ownership, validation, timestamps, and default status remain consistent.
-- [ ] Return a readable confirmation and the created task; reject empty/oversized text with 400 and invalid auth with 401.
-- [ ] Test message-to-task persistence and user isolation. Document that command phrases are treated as task titles in simple mode.
+- [x] Implement protected `POST /messages` with trimmed, nonempty text and the same 1–200 character title bound.
+- [x] Use the same task service as ordinary creation so ownership, validation, timestamps, and default status remain consistent.
+- [x] Return 200 with a readable confirmation and the created task; reject empty/oversized text with 400 and invalid auth with 401.
+- [x] Verify persistence after shutdown/restart, user isolation, boundary lengths, literal command handling, and list/statistics integration. All 95 combined tests pass, including 18 message tests; real-server smoke checks and `pip check` pass. README documents the simple-mode behavior.
 
 The issue lists simple and smarter bot behavior as alternatives. Check the chosen simple-mode box and the behavior-decision box; leave the unselected command-parser alternative unchecked with an explanatory note. If command parsing is requested, estimate it separately and add ownership tests for complete/delete/list commands.
 
@@ -182,9 +185,10 @@ Review each PR at its checkpoint and merge passing work before starting its depe
 - P4 merged PR: pending
 - P5 merged PR: pending
 - P6 merged PR: pending
-- Automated checks: P1 implementation commit `002d4f6` has 14 passing tests in a fresh Python 3.10 virtual environment; `pip check`, Uvicorn startup/health/docs smoke check, and `git diff --check` pass. The test stack emits one Starlette/httpx deprecation warning. P3-P6 verification remains pending; P2 results are recorded below.
+- Automated checks: P1 implementation commit `002d4f6` has 14 passing tests in a fresh Python 3.10 virtual environment; `pip check`, Uvicorn startup/health/docs smoke check, and `git diff --check` pass. The test stack emits one Starlette/httpx deprecation warning. P5-P6 verification remains pending; P2-P4 results are recorded below.
 - Browser acceptance evidence: pending
 - P2 verification: implementation commit `7735a00` has 45 passing combined tests (31 authentication cases); dependency checks and real Uvicorn signup/login/me/missing-token checks pass. One existing Starlette/httpx test-client deprecation warning remains.
 - P3 verification: 77 combined tests pass; the shutdown/restart test also passed after strengthening it to close the original app. Dependency checks and real-server CRUD/filter/stats/isolation smoke checks pass. One existing Starlette/httpx deprecation warning remains.
-- Remaining required issue boxes: P1-P2 merged; P3 tasks/statistics implemented and verified, with PR review/merge pending. Messages, frontend integration, and final release verification remain in P4-P6.
+- P4 verification: 95 combined tests pass, including 18 message tests. Real-server message/reply/list/count/validation/ownership checks and dependency checks pass. One existing Starlette/httpx deprecation warning remains.
+- Remaining required issue boxes: P1-P2 merged; P3 tasks/statistics and P4 messages implemented and verified, with PR review/merge pending. Frontend integration and final release verification remain in P5-P6.
 - Optional/later work deferred: pagination if omitted; smarter command parser; due dates/priority; search; password reset

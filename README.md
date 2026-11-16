@@ -22,7 +22,8 @@ http://localhost:8000/docs. `GET /health` returns `{"status":"ok"}`.
 
 P1 provides the application foundation and database models. P2 adds signup,
 login, and current-user authentication. P3 adds task CRUD, filtering, ordering,
-and dashboard statistics. Message handling remains planned for P4.
+and dashboard statistics. P4 adds protected simple-mode message-to-task handling.
+Frontend integration and final release checks remain in P5–P6.
 
 ## Configuration and database
 
@@ -77,7 +78,7 @@ operations with 200. Development CORS allows the frontend at
 | `PATCH /tasks/{id}` (implemented) | Title, description, and/or status | `{ task }` |
 | `DELETE /tasks/{id}` (implemented) | Bearer token | 200 `{ message }` |
 | `GET /tasks/stats` (implemented) | Bearer token | `{ total, completed, pending }` |
-| `POST /messages` | `{ text }` | `{ reply, task }` |
+| `POST /messages` (implemented) | `{ text }` | 200 `{ reply, task }` |
 
 User responses contain `id`, `name`, and `email`, never passwords or hashes.
 Passwords use Argon2id hashes through pwdlib; signup requires 8–128 characters.
@@ -109,6 +110,14 @@ deferred until its page-size/limit interaction is specified.
 
 Bot behavior chosen for today's scope: simple mode. Trimmed nonempty message
 text becomes a pending task, with a confirmation reply and the created task.
+The endpoint accepts only `{ "text": "..." }`, with the same 1–200 character
+title limit after trimming. It uses the ordinary task-creation service, and
+the new task appears in lists and statistics immediately. The reply is
+`Added task: <title>`. Empty, oversized, or invalid input returns 400;
+missing, invalid, or expired Bearer tokens return 401 without creating a task.
+Command phrases such as `complete task 3` and `delete task 2` are stored as
+literal task titles; they do not mutate existing tasks. Message-created tasks
+persist across restarts and belong only to the authenticated user.
 Command parsing, due dates/priority, title search, and password reset are later
 work. All task, statistics, and message operations will be scoped to the
 authenticated user.
@@ -129,3 +138,6 @@ of users and tokens across application restarts.
 Task tests cover authenticated CRUD, cross-user isolation for every operation,
 deterministic ordering, filters, dashboard limits/counts, validation without
 mutation, response fields, UTC timestamps, and persistence across restarts.
+Message tests cover trimmed titles, boundary lengths, invalid input, failed
+authentication without side effects, literal command handling, owner privacy,
+list/statistics integration, and persistence after shutdown/restart.
