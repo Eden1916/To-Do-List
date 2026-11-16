@@ -10,6 +10,7 @@ from starlette.responses import JSONResponse
 from todo_chat.config import Settings
 from todo_chat.database import build_engine
 from todo_chat.auth import router as auth_router
+from todo_chat.tasks import router as task_router
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ def create_app(settings: Settings | None = None) -> CORSMiddleware:
     api = FastAPI(title="To-Do List Bot API", lifespan=lifespan)
     api.state.settings = settings
     api.include_router(auth_router)
+    api.include_router(task_router)
 
     @api.exception_handler(HTTPException)
     async def http_error(request: Request, exc: HTTPException):

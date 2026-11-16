@@ -21,8 +21,8 @@ The API is at http://localhost:8000; interactive documentation is at
 http://localhost:8000/docs. `GET /health` returns `{"status":"ok"}`.
 
 P1 provides the application foundation and database models. P2 adds signup,
-login, and current-user authentication. Task routes, statistics, and message
-handling remain planned in subsequent PRs.
+login, and current-user authentication. P3 adds task CRUD, filtering, ordering,
+and dashboard statistics. Message handling remains planned for P4.
 
 ## Configuration and database
 
@@ -71,11 +71,12 @@ operations with 200. Development CORS allows the frontend at
 | `POST /auth/signup` (implemented) | `{ name, email, password }` | 201 `{ token, user }` |
 | `POST /auth/login` (implemented) | `{ email, password }` | 200 `{ token, user }` |
 | `GET /auth/me` (implemented) | Bearer token | `{ user }` |
-| `GET /tasks` | Optional query options below | `{ tasks }` |
-| `POST /tasks` | `{ title, description? }` | 201 `{ task }` |
-| `PATCH /tasks/{id}` | Title, description, and/or status | `{ task }` |
-| `DELETE /tasks/{id}` | Bearer token | 200 `{ message }` |
-| `GET /tasks/stats` | Bearer token | `{ total, completed, pending }` |
+| `GET /tasks` (implemented) | Optional query options below | `{ tasks }` |
+| `POST /tasks` (implemented) | `{ title, description? }` | 201 `{ task }` |
+| `GET /tasks/{id}` (implemented) | Bearer token | `{ task }` |
+| `PATCH /tasks/{id}` (implemented) | Title, description, and/or status | `{ task }` |
+| `DELETE /tasks/{id}` (implemented) | Bearer token | 200 `{ message }` |
+| `GET /tasks/stats` (implemented) | Bearer token | `{ total, completed, pending }` |
 | `POST /messages` | `{ text }` | `{ reply, task }` |
 
 User responses contain `id`, `name`, and `email`, never passwords or hashes.
@@ -96,9 +97,13 @@ Task responses contain `id`, `title`, `description`, `status`, `createdAt`,
 the creation default. Titles are trimmed and must have 1–200 characters.
 Timestamps are UTC ISO 8601. Partial updates allow clearing description with
 null, but reject null title/status and empty updates. Ownership is server-set.
+Every task read, update, and delete is scoped to the signed-in user. Missing
+and other-user IDs both return 404 `{"message":"Task not found"}`. Task IDs
+must be positive signed 64-bit integers. Statistics count only the user's tasks,
+with total equal to pending plus completed; an empty account receives zeros.
 
 List options are `status=completed|pending` (omitted means all),
-`limit` (positive, bounded; dashboard uses 3), and `sort=newest|oldest`
+`limit` (1–100; dashboard uses 3; omitted returns all), and `sort=newest|oldest`
 (default newest, creation time then ID). Optional `page` pagination remains
 deferred until its page-size/limit interaction is specified.
 
@@ -121,3 +126,6 @@ routes are not present in the application.
 Authentication tests also cover credential failures, normalization, concurrent
 duplicates, stored password hashes, invalid/expired tokens, and persistence
 of users and tokens across application restarts.
+Task tests cover authenticated CRUD, cross-user isolation for every operation,
+deterministic ordering, filters, dashboard limits/counts, validation without
+mutation, response fields, UTC timestamps, and persistence across restarts.

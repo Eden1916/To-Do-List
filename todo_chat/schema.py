@@ -77,6 +77,24 @@ class TaskResponse(TaskBase):
     owner_user_id: int = Field(serialization_alias="ownerUserId")
 
 
+class TaskResult(BaseModel):
+    task: TaskResponse
+
+
+class TaskList(BaseModel):
+    tasks: list[TaskResponse]
+
+
+class TaskStatistics(BaseModel):
+    total: int
+    completed: int
+    pending: int
+
+
+class MessageResponse(BaseModel):
+    message: str
+
+
 class ChatState(str, Enum):
     idle = "idle"
     waiting_description = "waiting_description"
