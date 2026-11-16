@@ -59,7 +59,7 @@ at `bb62c3d`, including the account-identity and SQL-parameter logging fixes.
 | --- | --- | --- | --- | --- | --- |
 | P1 | `feat/3-api-foundation` | Establish API contract and persistent data model | None | Runnable API, dependencies, config, database, models, schemas, CORS, consistent errors | [#4](https://github.com/Eden1916/To-Do-List/pull/4) — merged |
 | P2 | `feat/3-authentication` | Implement registration, login, and current user | P1 | Hashed passwords, expiring tokens, reusable auth dependency | [#5](https://github.com/Eden1916/To-Do-List/pull/5) — merged |
-| P3 | `feat/3-task-api` | Implement user-scoped tasks and dashboard statistics | P2 | Persistent CRUD, filters, ordering, counts, ownership | Pending |
+| P3 | `feat/3-task-api` | Implement user-scoped tasks and dashboard statistics | P2 | Persistent CRUD, filters, ordering, counts, ownership | [#6](https://github.com/Eden1916/To-Do-List/pull/6) — draft, targets main |
 | P4 | `feat/3-message-api` | Turn bot messages into persisted tasks | P3 | Protected simple-mode message endpoint and replies | Pending |
 | P5 | `feat/3-frontend-integration` | Connect frontend authentication, tasks, statistics, and messages | P4 | Working browser journey using actual API data | Pending |
 | P6 | `test/3-release-readiness` | Verify the complete to-do flow and document setup | P5 | Integration coverage, clean setup instructions, final issue evidence | Pending |
@@ -178,7 +178,7 @@ Review each PR at its checkpoint and merge passing work before starting its depe
 
 - P1 PR: [#4](https://github.com/Eden1916/To-Do-List/pull/4), merged into `main` at `5fac074`
 - P2 PR: [#5](https://github.com/Eden1916/To-Do-List/pull/5), merged into `main` at `bb62c3d`
-- P3 merged PR: pending
+- P3 PR: [#6](https://github.com/Eden1916/To-Do-List/pull/6), draft targeting `main`; implementation commit `693505e`
 - P4 merged PR: pending
 - P5 merged PR: pending
 - P6 merged PR: pending
