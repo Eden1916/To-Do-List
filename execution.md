@@ -1,6 +1,6 @@
 # To-Do List: end-to-end execution plan
 
-Target: finish the required checklist today, November 14, 2026 (America/Los_Angeles).
+Original target: November 14, 2026. Execution continued November 15, 2026 (America/Los_Angeles).
 Source: [Issue #3 — Backend requirments for the To Do List](https://github.com/Eden1916/To-Do-List/issues/3).
 
 This document is the implementation plan. Checkboxes below track completed and remaining work. P1–P6 identify work packages; actual GitHub PR numbers and links are recorded when opened.
@@ -11,7 +11,7 @@ This document is the implementation plan. Checkboxes below track completed and r
 - The locally available `origin/backend` has the same two files. The locally available `origin/frontend` contains a React/Vite application, authentication screens, dashboard, and task pages. Remote-tracking refs must be refreshed before implementation; they may be stale.
 - Existing schemas use `username`, boolean task status, and snake_case timestamps. Issue #3 requires user `name`, string task status, and camelCase task timestamps. Resolve these at the API boundary before integration.
 - Frontend auth currently has an unquoted JSON content type, `JSON.stringigy`, incorrect request serialization, and a dependency on `data.success` that is absent from the issue's required response shape. Dashboard counts are hardcoded and task fetching is commented out.
-- P1 implementation is on `feat/3-api-foundation`. P2 authentication is implemented on `feat/3-authentication`; verification and PR status are tracked below. P3-P6 have not started.
+- P1 and P2 have merged into `main`. P3 tasks/statistics are implemented on `feat/3-task-api`; verification and PR status are tracked below. P4-P6 have not started. The file observations above describe the initial baseline.
 
 ## Finish line and scope
 
@@ -52,15 +52,14 @@ Use a maintained password-hashing library with bcrypt or an equivalent secure al
 
 Start every new branch from updated `main` after its predecessor merges. This keeps PR diffs focused and avoids a stack that is hard to finish today. Keep existing `backend` and `frontend` branch work intact. Every PR references `Refs #3`; only P6 uses `Closes #3`, after all required acceptance checks pass. Update the actual PR column as work progresses.
 
-P1 (#4) has merged into `main`. P2 initially continued on top of P1 while it
-was a draft; the authentication branch is now synced with `origin/main`,
-and draft PR #5 targets `main` for review and eventual merge.
+P1 (#4) and P2 (#5) have merged into `main`. P3 starts from updated `main`
+at `bb62c3d`, including the account-identity and SQL-parameter logging fixes.
 
 | Order | Branch | Proposed PR title | Dependency | What it must achieve | Actual PR |
 | --- | --- | --- | --- | --- | --- |
 | P1 | `feat/3-api-foundation` | Establish API contract and persistent data model | None | Runnable API, dependencies, config, database, models, schemas, CORS, consistent errors | [#4](https://github.com/Eden1916/To-Do-List/pull/4) — merged |
-| P2 | `feat/3-authentication` | Implement registration, login, and current user | P1 | Hashed passwords, expiring tokens, reusable auth dependency | [#5](https://github.com/Eden1916/To-Do-List/pull/5) — draft, targets main |
-| P3 | `feat/3-task-api` | Implement user-scoped tasks and dashboard statistics | P2 | Persistent CRUD, filters, ordering, counts, ownership | Pending |
+| P2 | `feat/3-authentication` | Implement registration, login, and current user | P1 | Hashed passwords, expiring tokens, reusable auth dependency | [#5](https://github.com/Eden1916/To-Do-List/pull/5) — merged |
+| P3 | `feat/3-task-api` | Implement user-scoped tasks and dashboard statistics | P2 | Persistent CRUD, filters, ordering, counts, ownership | [#6](https://github.com/Eden1916/To-Do-List/pull/6) — draft, targets main |
 | P4 | `feat/3-message-api` | Turn bot messages into persisted tasks | P3 | Protected simple-mode message endpoint and replies | Pending |
 | P5 | `feat/3-frontend-integration` | Connect frontend authentication, tasks, statistics, and messages | P4 | Working browser journey using actual API data | Pending |
 | P6 | `test/3-release-readiness` | Verify the complete to-do flow and document setup | P5 | Integration coverage, clean setup instructions, final issue evidence | Pending |
@@ -90,14 +89,14 @@ Exit: a new user authenticates successfully; protected requests fail with 401 fo
 
 ### P3 — tasks and statistics (90–120 minutes)
 
-- [ ] Add create/list/update/delete routes with the authenticated user as the only source of ownership. Reject or ignore client-supplied owner IDs consistently.
-- [ ] Create pending tasks; allow title and/or status updates; update `updatedAt` on change and preserve `createdAt`.
-- [ ] Scope every task query, update, delete, and count to the current user. Other-user IDs behave as not found.
-- [ ] Implement all/completed/pending lists, bounded limit, and deterministic newest-first ordering; support the agreed sort values.
-- [ ] Implement title/status/query validation and JSON delete success; retain optional descriptions throughout the task lifecycle.
-- [ ] Return per-user counts from `/tasks/stats`; total must equal completed plus pending.
-- [ ] Test two-user isolation for reads, mutation, deletion, and statistics; test latest-three order, empty lists, invalid titles/statuses/limits, missing IDs, and persistence across application restart.
-- [ ] Optional: implement and test page pagination after required behaviors pass.
+- [x] Add create/list/read/update/delete routes with the authenticated user as the only source of ownership. Reject client-supplied owner IDs.
+- [x] Create pending tasks; allow title and/or status updates; update `updatedAt` on change and preserve `createdAt`.
+- [x] Scope every task query, update, delete, and count to the current user. Other-user IDs behave as not found.
+- [x] Implement all/completed/pending lists, limits of 1–100, and deterministic newest-first/oldest-first ordering with ID tie breaking.
+- [x] Implement title/status/query validation and JSON delete success; retain optional descriptions throughout the task lifecycle.
+- [x] Return per-user counts from `/tasks/stats`; total equals completed plus pending.
+- [x] Verify two-user isolation, latest-three ordering, empty lists, validation, missing IDs, UTC fields, timestamps, and persistence after shutdown/restart. All 77 tests pass; real Uvicorn CRUD/filter/stats/isolation smoke checks and `pip check` pass.
+- [ ] Optional page pagination: deferred; required lists return all tasks when limit is omitted.
 
 ### P4 — message input (30–45 minutes)
 
@@ -178,13 +177,14 @@ Review each PR at its checkpoint and merge passing work before starting its depe
 ## Completion record
 
 - P1 PR: [#4](https://github.com/Eden1916/To-Do-List/pull/4), merged into `main` at `5fac074`
-- P2 PR: [#5](https://github.com/Eden1916/To-Do-List/pull/5), draft targeting `main`; branch synced with `origin/main`
-- P3 merged PR: pending
+- P2 PR: [#5](https://github.com/Eden1916/To-Do-List/pull/5), merged into `main` at `bb62c3d`
+- P3 PR: [#6](https://github.com/Eden1916/To-Do-List/pull/6), draft targeting `main`; implementation commit `693505e`
 - P4 merged PR: pending
 - P5 merged PR: pending
 - P6 merged PR: pending
 - Automated checks: P1 implementation commit `002d4f6` has 14 passing tests in a fresh Python 3.10 virtual environment; `pip check`, Uvicorn startup/health/docs smoke check, and `git diff --check` pass. The test stack emits one Starlette/httpx deprecation warning. P3-P6 verification remains pending; P2 results are recorded below.
 - Browser acceptance evidence: pending
 - P2 verification: implementation commit `7735a00` has 45 passing combined tests (31 authentication cases); dependency checks and real Uvicorn signup/login/me/missing-token checks pass. One existing Starlette/httpx test-client deprecation warning remains.
-- Remaining required issue boxes: P1 merged; P2 authentication implemented and verified, with PR review/merge pending. Task/statistics endpoints, messages, and frontend integration remain in P3-P6.
+- P3 verification: 77 combined tests pass; the shutdown/restart test also passed after strengthening it to close the original app. Dependency checks and real-server CRUD/filter/stats/isolation smoke checks pass. One existing Starlette/httpx deprecation warning remains.
+- Remaining required issue boxes: P1-P2 merged; P3 tasks/statistics implemented and verified, with PR review/merge pending. Messages, frontend integration, and final release verification remain in P4-P6.
 - Optional/later work deferred: pagination if omitted; smarter command parser; due dates/priority; search; password reset
