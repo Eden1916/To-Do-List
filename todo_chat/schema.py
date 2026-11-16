@@ -95,6 +95,16 @@ class MessageResponse(BaseModel):
     message: str
 
 
+class BotMessage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    text: Title
+
+
+class BotReply(BaseModel):
+    reply: str
+    task: TaskResponse
+
+
 class ChatState(str, Enum):
     idle = "idle"
     waiting_description = "waiting_description"
